@@ -2,6 +2,8 @@
 
 BioIT-EMBL Centres Joint Training Week, Mar. 26, 2014
 
+Kota Miura (CMCI, EMBL)
+
 - [Course Web Page](https://bio-it.embl.de/joint-training) (only internal access)
 
 ##Contents
@@ -45,7 +47,7 @@ BioIT-EMBL Centres Joint Training Week, Mar. 26, 2014
   - Aliaksandr will be partially appearing to assist you. He has been coding image analysis tools in Matlab, but knows ImageJ/Fiji pretty well and coding in Jython.   
   
 - Acknowledgements
-  - Thanks to Fatima Verissimo, Faba Neumann, Rainer Pepperkok and Jean-Karim Hériché for providing data, hsaring their experiences and giving advices on these data. 
+  - Thanks to Fatima Verissimo, Faba Neumann, Rainer Pepperkok and Jean-Karim Hériché for providing data, sharing their experiences and giving advices on these data. 
   - Thanks to Bernd Klaus, Matt Rogon and Aidan Budd (the course team) for ther effort in starting up this course and working together.   
 
 ##Course Outline
@@ -88,9 +90,6 @@ Ellenberg, J., Pepperkok, R., 2012. Genome-wide RNAi screening identifies human 
 
 ## Configuration for March 24
 
-Kota Miura
-
-[TOC]
 
 ### Install Fiji on your desktop
 
