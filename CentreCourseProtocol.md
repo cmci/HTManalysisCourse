@@ -674,31 +674,51 @@ When this code is executed, your machine will make a beep sound. In such a way a
 ###Class ImagePlus
 
 
-imp.getTitle()
-imp.deleteRoi()
-imp.setRoi()
-imp.duplicate()
-imp.getProcessor()
+* imp.getTitle()
+* imp.deleteRoi()
+* imp.setRoi()
+* imp.duplicate()
+* imp.getProcessor()
 
 ###Class ImageProcessor
 
 
-impstats = ip.getStatistics()
-ip.getMax()
-ip.setThreshold(min, max, lut)
-ip.resetThreshold()
-
-ip.subtract(val)
-ip.invertLut()
-r = ip.restRoi()
-ip.setRoi()
+* impstats = ip.getStatistics()
+* ip.getMax()
+* ip.setThreshold(min, max, lut)
+* ip.resetThreshold()
+* ip.subtract(val)
+* ip.invertLut()
+* r = ip.restRoi()
+* ip.setRoi()
 
 ###Class ImageStatistics
 
-impstats.mean
+* impstats.mean
 
 
 ###Constructing an Object
+
+So far, I have not explained an important difference in types of methods: There are static and non-static methods. If you see the Javadoc of class IJ, you will see that all methods of this class has "static" as its property. This means that you could use those methods by appending the name of the method directly after name of the class. 
+
+With none static methods, this is not possible. For example, the class ImagePlus has many methods such as "getHeight()", which is to get the height of the image. If you try to do 
+
+	ptint ImagePlus.getHeight()
+
+It will not work. This is simply because we (and mainly the computer) do not know which image we are talkling about. Instead we must use a specific **instance** of image, such as the one you grabbed by IJ.openImage(). Remember, 
+
+	imp = IJ.openImage('/Users/miura/image.tif')
+	
+This "imp" is a specific instance of image because we know that we loaded the image from a specific file and we now call it as "imp". ImagePlus is a class, but never becomes existing until it is "constucted" by loading an image from a file or creating a image from scratch or grabbing a image that is opened on desktop. 
+
+Classes that became into existing entity is called an "Instance" or "Object". None static methods work only when an instance is there. 
+
+Many of the methods actually do not have meaning if a specific instance is not there, just because there are Classes for processing images. For instance, GaussianBlur is a class that does Gaussian blurring. It's methods are all none static but one, and for these non-static methods to work, an instance of GaussianBlur class should be constucted first. 
+
+	gb = GaussianBlur() //Constructs an instance of Gaussian Blur object
+
+You could see how to constuct an instance in the "constructor summary" in the Javadoc. 
+
 
 
 	imp = IJ.getImage()
