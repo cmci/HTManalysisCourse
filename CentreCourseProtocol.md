@@ -2,22 +2,56 @@
 
 BioIT-EMBL Centres Joint Training Week, Mar. 26, 2014
 
-Kota Miura
+- [Course Web Page](https://bio-it.embl.de/joint-training) (only internal access)
 
-Centre for Molecular and Cellular Imaging (CMCI), EMBL
+##Contents
 
-<miura@embl.de>
+- [Instructors](#instructors)
+- [Course Outline](#course-outline)
+- [Introduction](#introduction)
+- [Configuration for March 24](#configuration-for-march-24)
+  - [Install Fiji on your desktop](#install-fiji-on-your-desktop)
+  - [Configure access to the Fiji in the network](#configure-access-to-the-fiji-in-the-network)
+  - [ Check if Fiji is working](#Check if Fiji is working)
+- [Methods (Image Analysis)](#methods-image-analysis)
+- [Resources](#resources)
+  - [Fiji](#fiji)
+  - [Data](#data)
+  - [Scripts](#scripts)  
+- [Workflow: GUI](#workflow-gui)
+- [Workflow: Python Primer](#workflow-python-primer)
+- [Workflow: Fiji Jython Scripting](#workflow:-fiji-jython-scripting)
+- 
+## Instructors
 
-TA: Christoph Schiklenk
+- Kota Miura
+  - Centre for Molecular and Cellular Imaging (CMCI), EMBL
+  - <miura@embl.de>
 
-Haering Lab, Cell Biology & Biophysics, EMBL
+- Christoph Schiklenk
+  - Haering Lab, Cell Biology & Biophysics, EMBL
+  - Christoph has been using Fiji/Jython for a year and he now is a quite literate Fiji scripting guy. He is volunteering to assist your learning. 
 
-[TOC]
+- Clemens Lakner
+  - Bio-IT, EMBL
+  - Clemens wrote the job-array generator scripts for image analysis. He will explain to you how his shell script is working.
+  
+- Christian Tischer
+  - ALMF, EMBL
+  - Tischi will be partially appearing to assist you. Imaging expert and not only an Jython-Fiji expert, but also a Cell Profiler expert.
+
+- Aliaksandr Halavatyi
+  - Pepperkok Lab, Cell Biology & Biophysics, EMBL
+  - Aliaksandr will be partially appearing to assist you. He has been coding image analysis tools in Matlab, but knows ImageJ/Fiji pretty well and coding in Jython.   
+  
+- Acknowledgements
+  - Thanks to Fatima Verissimo, Faba Neumann, Rainer Pepperkok and Jean-Karim Hériché for providing data, hsaring their experiences and giving advices on these data. 
+  - Thanks to Bernd Klaus, Matt Rogon and Aidan Budd (the course team) for ther effort in starting up this course and working together.   
 
 ##Course Outline
 
-1. Aim: Learn how to process and analyze high content image data by Fiji scripting
-2. Introduction: Background of data
+1. **Aim: Learn how to process and analyze high content image data by Fiji scripting**
+2. Introduction: the background of data, setting up.
 3. Processing and analyzing using Fiji GUI
    - We first try to segment nucleus image and do measurement using GUI, to know how the algorithm works.    
 4. Python Crash Course
@@ -145,7 +179,7 @@ Reload the profile
 source .bash_profile
 ```
 
-### Check if Fiji is working. 
+### Check if Fiji is working 
 
 If you are still connected to one of the nodes, do
 
@@ -338,7 +372,7 @@ Within each of these folders, images are stored under
 
 ###Scripts
 
-The script for processing images for a single plage is
+The script for processing images for a single plate is
 
 	/g/almf/software/scripts2/measTransportBatch3.py
 	
