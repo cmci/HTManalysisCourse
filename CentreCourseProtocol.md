@@ -12,7 +12,7 @@ TA: Christoph Schiklenk
 
 Haering Lab, Cell Biology & Biophysics, EMBL
 
-
+[TOC]
 
 ##Course Outline
 
@@ -52,6 +52,211 @@ Followings are the literatures published with this dataset.
 - Simpson, J.C., Joggerst, B., Laketa, V., Verissimo, F., Cetin, C., Erfle, H., Bexiga, M.G., Singan, V.R., Hériché, J.-K., Neumann, B., Mateos, A., Blake, J., Bechtel, S., Benes, V., Wiemann, S., 
 Ellenberg, J., Pepperkok, R., 2012. Genome-wide RNAi screening identifies human proteins with a regulatory function in the early secretory pathway. Nat. Cell Biol. 14, 764–74. <http://www.ncbi.nlm.nih.gov/pubmed/22660414>
 
+## Configuration for March 24
+
+Kota Miura
+
+[TOC]
+
+### Install Fiji on your desktop
+
+Access the following page
+
+```
+http://fiji.sc/Downloads
+```
+
+then install "Life-Line Version", Linux 64-bit. Place the Fiji folder on your desktop. 
+
+###  Configure access to the Fiji in the network 
+
+For using Fiji in the network from command line, do the following. 
+
+#### Add an alias in your local bash profile.
+
+Open ~/.bash_profile
+
+```
+open ~/.bash_profile
+```
+
+Add the following line in your bash profile (.bash_profile). 
+
+```
+alias cluster='ssh -t <YOUR UNIX USERNAME>@submaster '\''bsub -M 5000 -Is bash'\'''
+```
+
+By the way, this will allow you to execute the command below as an alias'cluster'
+
+```
+ssh -t <YOUR UNIX USERNAME>@submaster \bsub -M 5000 -Is bash
+```
+If you have time, try the above command directly and see that it works. 
+
+Reload the .bash_profle by 
+
+```
+source .bash_profile
+```
+
+to validate your changes. 
+
+#### Add several paths to your .bash_profile in the network.
+
+If your are ready with the above new alias, try
+
+```
+cluster
+```
+
+You will then be asked for your password, and then will be connected to one of the cluster nodes in an interactive mode. 
+
+Open your .bash_profile:
+
+```
+vim ~/.bash_profile
+```
+
+If you are not use to vi editor, you could use others such as
+
+
+```
+nano ~/.bash_profile
+
+```
+
+Otherwise, it might be able to edit the .bash_profile directly from your course linux machine. 
+
+
+Add the follwoing lines in your .bash_profile
+
+```
+export PATH=/g/software/bin:$PATH
+export PATH=/g/almf/software/bin2:$PATH
+export PATH=/g/almf/software/bin/java/jdk1.6.0_45/bin/:$PATH
+export JAVA_HOME=/g/almf/software/bin/java/jdk1.6.0_45
+```
+
+This is just to run Fiji from your command line (the one that I am maintaining) and to use the right Java version. You could delete these lines after the course. 
+
+Reload the profile
+
+```
+source .bash_profile
+```
+
+### Check if Fiji is working. 
+
+If you are still connected to one of the nodes, do
+
+```
+java -version
+```
+
+The output should look like
+
+```
+[miura@compute083]~ $
+java -version
+java version "1.6.0_45"
+Java(TM) SE Runtime Environment (build 1.6.0_45-b06)
+Java HotSpot(TM) 64-Bit Server VM (build 20.45-b01, mixed mode)
+```
+
+If your java version is OK (same as above), then 
+
+```
+fiji --help
+```
+ The output should be
+ 
+ ```
+ [miura@compute083]~ $
+fiji --help
+Usage: fiji [<Java options>.. --] [<ImageJ options>..] [<files>..]
+
+Java options are passed to the Java Runtime, ImageJ
+options to ImageJ (or Jython, JRuby, ...).
+
+In addition, the following options are supported by ImageJ:
+General options:
+--help, -h
+	show this help
+--dry-run
+	show the command line, but do not run anything
+--debug
+	verbose output
+--system
+	do not try to run bundled Java
+--java-home <path>
+	specify JAVA_HOME explicitly
+--print-java-home
+	print ImageJ's idea of JAVA_HOME
+--print-ij-dir
+	print where ImageJ thinks it is located
+--headless
+	run in text mode
+--ij-dir <path>
+	set the ImageJ directory to <path> (used to find
+	 jars/, plugins/ and macros/)
+--heap, --mem, --memory <amount>
+	set Java's heap size to <amount> (e.g. 512M)
+--class-path, --classpath, -classpath, --cp, -cp <path>
+	append <path> to the class path
+--jar-path, --jarpath, -jarpath <path>
+	append .jar files in <path> to the class path
+--pass-classpath
+	pass -classpath <classpath> to the main() method
+--full-classpath
+	call the main class with the full ImageJ class path
+--dont-patch-ij1
+	do not try to runtime-patch ImageJ1
+--ext <path>
+	set Java's extension directory to <path>
+--default-gc
+	do not use advanced garbage collector settings by default
+	(-Xincgc -XX:PermSize=128m)
+--gc-g1
+	use the G1 garbage collector
+--debug-gc
+	show debug info about the garbage collector on stderr
+--debugger=<port>
+	start the JVM in a mode so Eclipse's debugger can attach to it
+--no-splash
+	suppress showing a splash screen upon startup
+
+Options for ImageJ:
+--ij2
+	start ImageJ2 instead of ImageJ1
+--ij1
+	start ImageJ1
+--allow-multiple
+	do not reuse existing ImageJ instance
+--plugins <dir>
+	use <dir> to discover plugins
+--run <plugin> [<arg>]
+	run <plugin> in ImageJ, optionally with arguments
+--compile-and-run <path-to-.java-file>
+	compile and run <plugin> in ImageJ
+--edit [<file>...]
+	edit the given file in the script editor
+
+Options to run programs other than ImageJ:
+--update
+	start the command-line version of the ImageJ updater
+--javah
+	start javah instead of ImageJ
+--javap
+	start javap instead of ImageJ
+--javadoc
+	start javadoc instead of ImageJ
+--main-class <class name> (this is the
+	default when called with a file ending in .class)
+	start the given class instead of ImageJ
+--retrotranslator
+	use Retrotranslator to support Java < 1.6
+ ```
+ 
 ## Methods (Image Analysis)
 
 As we are interested in the attenuation or the enhancement of the protein transport machinary from ER to the plasma membrane via the Golgi apparatus, we compare the protein density in ER, the Golgi and the plasma membrane. For this, we use three different images. 
