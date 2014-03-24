@@ -23,7 +23,8 @@ Kota Miura (CMCI, EMBL)
 - [Workflow: GUI](#workflow-gui)
 - [Workflow: Python Primer](#workflow-python-primer)
 - [Workflow: Fiji Jython Scripting](#workflow:-fiji-jython-scripting)
-- 
+
+
 ## Instructors
 
 - Kota Miura
@@ -75,7 +76,7 @@ To study the transport process, it is desirable to take time lapse sequence to f
 
 With this snapshot strategy, it is possible to systematically prepare a set of siRNAs and drug treatments to test their effect on vesicle transport system: the high content image screening. 
 
-In this course, we will try to analyze all images from different types of treatments automatically, evaluate and compare the difference in the effeciency of transport. This COULD be done manually, but we have huge number of various treatments: approximately  of images to analyze. To not to end the rest of our life clicking images, we will completely automate the image processing and  analysis to extract transport parametes and output results as a huge list of parameter table. 
+In this course, we will try to analyze all images from different types of treatments automatically, evaluate and compare the difference in the effeciency of transport. This COULD be done manually, but we have huge number of various treatments: approximately 700,000 of images to analyze. To not to end the rest of our life clicking images, we will completely automate the image processing and  analysis to extract transport parametes and output results as a huge list of parameter table. 
 
 This table then is studied using statistical techniques to distinguish treatments that are largely affecting the transport system. 
 
@@ -363,7 +364,7 @@ For exmaple:
 
 	0001-03--2005-08-01
 
-This means that this is the plate ID 1, third experiment (same plate configuration is repeated at least three times each). We analyze plateID from 1 to 159. 
+This means that this is the plate ID 1, third experiment (same plate configuration is repeated at least three times each). We analyze plateID from 1 to 159. There are 703 folders so the cluster job array will be composed of 703 jobs.  
 
 Within each of these folders, images are stored under 
 	
@@ -375,11 +376,15 @@ The script for processing images for a single plate is
 
 	/g/almf/software/scripts2/measTransportBatch3.py
 	
+To process a plate, for example the first plate '0001-03--2005-08-01', the plate folder name is given as an argument to a command like below:
+
+	fiji --headless --mem=1000m /g/almf/software/scripts2/measTransportBatch3.py '0001-03--2005-08-01'
+   
 Prescreening script is 
 
 	/g/almf/software/scripts2/listFocusedImagesV2.py
 	
-A script for generating job array is
+A script for generating job array written by Clemens Lankner is
 	
 	
 ## Workflow: GUI
@@ -524,7 +529,21 @@ Calculate transport efficiency and add the results to results table. All results
 
 ## Workflow: Python Primer
 
-We do this interactively. Below is a list of Python funtions we conver.
+Jython is Java-implemented Python, allowing us to access Java classes in Python syntax. To write Jython scripts in Fiji, we use Script Editor. 
+
+	[File > New > Script]
+
+This command launches the editor and a new script file. 
+
+Script Editor has ist own menu, and one of them is 
+
+	[Language > Python]
+	
+To set the language to Python (Jython).
+
+ The editor has two panels. Upper one is the input field, and the lower one is the output field. Output field has two types, standard output and error output. You could toggle this by clicking "error" or "output".
+ 
+We learn the basics of Python commands interactively. Below is a list of Python funtions we go over.
 
 ````
 print
@@ -591,6 +610,121 @@ For more information, see
 
 ## Workflow: Fiji Jython Scripting
 
+### IJ.log
+
+Let's first try accessing Java classes. Try the following. 
+
+````
+IJ.log("Hello World!")
+````
+
+This will print the argument "Hello World!" in the Log window (in ImageJ macro, similar job can be done by print(string) command).
+
+We could add another line
+
+````
+IJ.log("Hello World!")
+IJ.log("\\Clear")
+````
+Run this code, and compare with the output of 
+
+````
+IJ.log("\\Clear")
+IJ.log("Hello World!")
+````
+
+The double back-slash
+
+	\\ 
+
+is called escape sequence, and is a command send to the interpretor. Insted of printing the following string in the Log window, it is interpreted as a command. In case of "\\Clear", texts in the Log window will be cleared. 
+
+### Javadoc
+
+Now, let's see a bit more of details about "IJ.log". Click the following link and see the page
+
+[Javadoc - IJ](http://rsbweb.nih.gov/ij/developer/api/ij/IJ.html)
+
+This is a documentation called "Javadoc" and is a reference for all the functionality that an Java applicaiton has. It's **VERY IMPORTANT** to understand how to use this documentation, so I wll explain in details. 
+
+ImageJ is a collection of many classes, and you could find all those classes in this javadoc. The web page has side bar in the left side, and it is separated to the upper and the lower panels. The upper panel has its title "Packages" and the bottle panel is "Classes". As I have already said, ImageJ is a colleciton of many classes - and they are all listed in the bottom panel. 
+
+Since there are many classes, they are organized in hierarchical way by "packages". You could imagine each packages as a folder in file system. For example, you could find a package named "ij". It means something like a folder named "ij", and for a package "ij.plugin.filter", its a folder "filter" under a folder "plguin" within a folder "ij" (in fact, class files are located in file system in this way). 
+
+In the bottom panel, all classes are listed as long as you have not filtered them by clicking one of the packages in the upper panel. Try to look for the class **IJ** by scrolling down the lower panel, and click the link "IJ". 
+
+You will then see a new page in the right side: There is a big text saying "Class IJ". IJ from IJ.log is a **class**, which contains many **methods**. To see those methods, scroll down the page and you will find a table titled "Method Summary". This is an alphabetical list of all methods that IJ contains. Among them, you could find 
+
+	log(java.lang.String s) 
+
+To use a method from IJ class, you just need a dot after the class name and then add the name of the method. In case of the method "log", you need an argument and it should be a String type. In the example we tried above, it was "Hello World!". 
+
+How about other methods? Try the method beep(). 
+
+	IJ.beep()
+	
+When this code is executed, your machine will make a beep sound. In such a way all the methods are usable. 
+
+###Loading and showing Image
+
+	imp = IJ.openImage('/Users/miura/image.tif')
+	
+	imp.show()
+	
+###Class ImagePlus
+
+
+imp.getTitle()
+imp.deleteRoi()
+imp.setRoi()
+imp.duplicate()
+imp.getProcessor()
+
+###Class ImageProcessor
+
+
+impstats = ip.getStatistics()
+ip.getMax()
+ip.setThreshold(min, max, lut)
+ip.resetThreshold()
+
+ip.subtract(val)
+ip.invertLut()
+r = ip.restRoi()
+ip.setRoi()
+
+###Class ImageStatistics
+
+impstats.mean
+
+
+###Constructing an Object
+
+
+	imp = IJ.getImage()
+	pf = ProfilePlot(imp)
+	profile = pf.getProfile()
+	for val in profile:
+		print val
+		
+We combine this with the python package csv to write the output to a comma separated value text file. 
+
+	import csv
+	
+	imp = IJ.getImage()
+	pf = ProfilePlot(imp)
+	profile = pf.getProfile()
+	for val in profile:
+		print val
+	f = open('/Users/miura/Desktop/prof.csv', 'wb')
+	writer = csv.writer(f)
+	for index, val in enumerate(profile):
+		writer.writerow([index, val])
+	f.close()
+
+
+## Workflow: Implementing Image Analysis
+
 ### Prescreening of Images.
 
 <https://gist.github.com/cmci/9684453>
@@ -612,8 +746,6 @@ This script segments nucleus.
 ### Measurements
 
 #### Transport Ratio
-
-
 
 #### Haralick Features
 
