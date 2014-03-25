@@ -607,7 +607,7 @@ dictionary
 
 Accessing files
      path / file managements
-          os.path.listdir
+          os.listdir
           os.path.isfile
           os.path.join
 
@@ -624,11 +624,56 @@ csv.reader
 
 ````
 
-Codes used in this interactive session is in 
+Codes used in this interactive session assembled in a file and in 
 
 <https://gist.github.com/cmci/9687511>
 
-For more information, see
+### File access
+
+```python
+import os
+
+root = '/Volumes/data/bio-it_centres_course/data/course'
+#filename = 'dapi.tif'
+files = os.listdir(root)
+
+print 'file 1: ', files[0]
+fullpath = os.path.join(root, files[0])
+print fullpath
+
+print 'file 2: ', files[1]
+fullpath = os.path.join(root, files[1])
+print os.path.isfile(fullpath)
+
+```
+
+### Writing CSV
+
+```python
+import csv
+
+f = open('/Users/miura/tmp/test.csv', 'wb')
+writer = csv.writer(f)
+writer.writerow(['id', 'mean', 'sd'])
+writer.writerow([1, 10.5, 3.3])
+f.close()
+```
+
+### Reading CSV
+
+```python
+import csv
+ 
+filepath = '/Users/miura/tmp/test.csv'
+f = open(filepath, 'rb')
+data = csv.reader(f)
+for row in data:
+    print ', '.join(row)
+```
+
+###For more information
+
+see
 
 <http://www.jython.org/docs/library/indexprogress.html>
 
@@ -1067,17 +1112,256 @@ backSub(imp)
 
 A script for processing single image dataset is:
 
+<https://gist.github.com/cmci/9765308>
+
+```python
+from ij.plugin.filter import GaussianBlur
+from fiji.threshold import Auto_Local_Threshold as ALT
+from ij.plugin.filter import ParticleAnalyzer as PA
+from org.jfree.data.statistics import BoxAndWhiskerCalculator
+from java.util import ArrayList, Arrays
+import os
+
+# size of juxtanuclear region. In pixels.
+RIMSIZE = 15
+# image background is expected to be black. 
+Prefs.blackBackground = True
+# verbose output
+VERBOSE = False
+
+root = '/Volumes/data/bio-it_centres_course/data/course'
+filedapi = '--W00005--P00001--Z00000--T00000--dapi.tif'
+
+nucpath = os.path.join(root, filedapi)
+
+impN = IJ.openImage(nucpath)
+
+class InstBWC(BoxAndWhiskerCalculator):
+    def __init__(self):
+        pass
+        
+def getOutlierBound(rt):
+  """ Analyzes the results of the 1st partcile analysis.
+  Since the dilation of nuclear perimeter often causes 
+  overlap of neighboring neculeus 'terrirories', such nucleus 
+  are discarded from the measurements. 
+
+  Small nucelei are already removed, but since rejection of nuclei depends on 
+  standard outlier detection method, outliers in both smaller and larger sizes
+  are discarded. 
+  """
+  area = rt.getColumn(rt.getColumnIndex('Area'))
+  circ = rt.getColumn(rt.getColumnIndex("Circ."))
+  arealist = ArrayList(Arrays.asList(area.tolist()))
+  circlist = ArrayList(Arrays.asList(circ.tolist()))
+  bwc = InstBWC()
+  ans = bwc.calculateBoxAndWhiskerStatistics(arealist)
+  #anscirc = bwc.calculateBoxAndWhiskerStatistics(circlist)
+  if (VERBOSE):
+    print ans.toString()
+    print ans.getOutliers()
+  q1 = ans.getQ1()
+  q3 = ans.getQ3()
+  intrange = q3 - q1 
+  outlier_offset = intrange * 1.5
+  return q1, q3, outlier_offset
+
+def nucleusSegmentation(imp2):
+    """ Segmentation of nucleus image. 
+    Nucleus are selected that:
+    1. No overlapping with dilated regions
+    2. close to circular shape. Deformed nuclei are rejected.
+    Outputs a binary image.
+    """
+#Convert to 8bit
+    ImageConverter(imp2).convertToGray8()
+#blur slightly using Gaussian Blur 
+    radius = 2.0
+    accuracy = 0.01
+    GaussianBlur().blurGaussian( imp2.getProcessor(), radius, radius, accuracy)
+# Auto Local Thresholding
+    imps = ALT().exec(imp2, "Bernsen", 15, 0, 0, True)
+    imp2 = imps[0]
+
+
+#ParticleAnalysis 0: prefiltering by size and circularity
+    rt = ResultsTable()
+    paOpt = PA.CLEAR_WORKSHEET +\
+                    PA.SHOW_MASKS +\
+                    PA.EXCLUDE_EDGE_PARTICLES +\
+                    PA.INCLUDE_HOLES #+ \
+#		PA.SHOW_RESULTS 
+    measOpt = PA.AREA + PA.STD_DEV + PA.SHAPE_DESCRIPTORS + PA.INTEGRATED_DENSITY
+    MINSIZE = 20
+    MAXSIZE = 10000
+    pa0 = PA(paOpt, measOpt, rt, MINSIZE, MAXSIZE, 0.8, 1.0)
+    pa0.setHideOutputImage(True)
+    pa0.analyze(imp2)
+    imp2 = pa0.getOutputImage() # Overwrite 
+    imp2.getProcessor().invertLut()
+    impNuc = imp2.duplicate()	## for the ring. 
+    #impNuc = Duplicator().run(imp2)
+
+#Dilate the Nucleus Area
+## this should be 40 pixels in Cihan's method, but should be smaller. 
+    rf = RankFilters()
+    rf.rank(imp2.getProcessor(), RIMSIZE, RankFilters.MAX)
+
+#Particle Analysis 1: get distribution of sizes. 
+
+    paOpt = PA.CLEAR_WORKSHEET +\
+                    PA.SHOW_NONE +\
+                    PA.EXCLUDE_EDGE_PARTICLES +\
+                    PA.INCLUDE_HOLES #+ \
+#		PA.SHOW_RESULTS 
+    measOpt = PA.AREA + PA.STD_DEV + PA.SHAPE_DESCRIPTORS + PA.INTEGRATED_DENSITY
+    rt1 = ResultsTable()
+    MINSIZE = 20
+    MAXSIZE = 10000
+    pa = PA(paOpt, measOpt, rt1, MINSIZE, MAXSIZE)
+    pa.analyze(imp2)
+    #rt.show('after PA 1')
+#particle Analysis 2: filter nucleus by size and circularity. 
+    #print rt1.getHeadings()
+    if (rt1.getColumnIndex('Area') > -1):
+      q1, q3, outlier_offset = getOutlierBound(rt1)
+    else:
+      q1 = MINSIZE
+      q3 = MAXSIZE
+      outlier_offset = 0
+      print imp2.getTitle(), ": no Nucleus segmented,probably too many overlaps"
+
+    paOpt = PA.CLEAR_WORKSHEET +\
+                    PA.SHOW_MASKS +\
+                    PA.EXCLUDE_EDGE_PARTICLES +\
+                    PA.INCLUDE_HOLES #+ \
+#		PA.SHOW_RESULTS 
+    rt2 = ResultsTable()
+    pa = PA(paOpt, measOpt, rt2, q1-outlier_offset, q3+outlier_offset, 0.8, 1.0)
+    pa.setHideOutputImage(True)
+    pa.analyze(imp2)
+    impDilatedNuc = pa.getOutputImage() 
+
+#filter original nucleus
+
+    filteredNuc = ImageCalculator().run("AND create", impDilatedNuc, impNuc)
+    return filteredNuc    
+      
+imp2 = impN.duplicate()
+impfilteredNuc = nucleusSegmentation(imp2)
+impfilteredNuc.show()
+
+```
 <https://gist.github.com/cmci/9644827>
 
-This script segments nucleus. 
 
-### ROI generator
+### ROI generator, Measurements & Transport Ratio
 
-### Measurements
+```python
+import os, sys
+from ij.plugin.filter import ParticleAnalyzer as PA
 
-#### Transport Ratio
+# size of juxtanuclear region. In pixels.
+RIMSIZE = 15
 
-#### Haralick Features
+def roiRingGenerator(r1):
+  """ Create a band of ROI outside the argument ROI.
+  See Liebel (2003) Fig. 1
+  """
+  #r1 = imp.getRoi()
+  r2 = RoiEnlarger.enlarge(r1, RIMSIZE)
+  sr1 = ShapeRoi(r1)
+  sr2 = ShapeRoi(r2)
+  return sr2.not(sr1)
+
+def roiEnlarger(r1):
+  """ Enlarges ROI by a defined iterations.
+  """
+  return ShapeRoi(RoiEnlarger.enlarge(r1, RIMSIZE))
+
+def measureROIs(imp, measOpt, thisrt, roiA, backint, doGLCM):    
+  """ Cell-wise measurment using ROI array. 
+  """
+  analObj = Analyzer(imp, measOpt, thisrt)
+  for index, r in enumerate(roiA):
+    imp.deleteRoi()
+    imp.setRoi(r)
+    analObj.measure()
+    maxint = thisrt.getValue('Max', thisrt.getCounter()-1)
+    saturation = 0
+    if ( maxint + backint) >= 4095:
+      saturation = 1
+      if (VERBOSE):
+        print 'cell index ', index, 'maxint=', maxint
+    thisrt.setValue('CellIndex', thisrt.getCounter()-1, index)
+    thisrt.setValue('Saturation', thisrt.getCounter()-1, saturation)
+  if (doGLCM):
+    imp.deleteRoi()
+    #measureTexture(imp, thisrt, roiA)
+    
+## loading files
+root = '/Volumes/data/bio-it_centres_course/data/course'
+fileNuc = 'dapiSegmented.tif'
+filepm = 'pm-647BackSub.tif'
+filevsvg = 'vsvg-cfpBackSub.tif'
+
+nucfull = os.path.join(root, fileNuc)
+pmfull = os.path.join(root, filepm)
+vsvgfull = os.path.join(root, filevsvg)
+impfilteredNuc = IJ.openImage(nucfull)
+impPM = IJ.openImage(pmfull)
+impVSVG = IJ.openImage(vsvgfull)
+
+wnumber = '00005'
+
+rtallcellPM = ResultsTable()
+rtjnucVSVG = ResultsTable()
+rtallcellVSVG = ResultsTable()
+  
+
+intmax = impfilteredNuc.getProcessor().getMax()
+if intmax == 0:
+    #return rtallcellPM, rtjnucVSVG, rtallcellVSVG
+    exit()
+
+impfilteredNuc.getProcessor().setThreshold(1, intmax, ImageProcessor.NO_LUT_UPDATE)
+nucroi = ThresholdToSelection().convert(impfilteredNuc.getProcessor())
+nucroiA = ShapeRoi(nucroi).getRois()
+#print nucroiA
+allcellA = [roiEnlarger(r) for r in nucroiA]
+jnucroiA = [roiRingGenerator(r) for r in nucroiA]
+
+measOpt = PA.AREA + PA.MEAN + PA.CENTROID + PA.STD_DEV + PA.SHAPE_DESCRIPTORS + PA.INTEGRATED_DENSITY + PA.MIN_MAX +\
+    PA.SKEWNESS + PA.KURTOSIS + PA.MEDIAN + PA.MODE
+
+## All Cell Plasma Membrane intensity
+measureROIs(impPM, measOpt, rtallcellPM, allcellA, 0, True)
+meanInt_Cell = rtallcellPM.getColumn(rtallcellPM.getColumnIndex('Mean'))
+print "Results Table rownumber:", len(meanInt_Cell)
+# JuxtaNuclear VSVG intensity 
+measureROIs(impVSVG, measOpt, rtjnucVSVG, jnucroiA, 0, False)    
+meanInt_jnuc = rtjnucVSVG.getColumn(rtjnucVSVG.getColumnIndex('Mean'))
+
+# AllCell VSVG intensity 
+measureROIs(impVSVG, measOpt, rtallcellVSVG, allcellA, 0, True)    
+meanInt_vsvgall = rtallcellVSVG.getColumn(rtallcellVSVG.getColumnIndex('Mean'))
+
+
+for i in range(len(meanInt_Cell)):
+    if meanInt_Cell[i] != 0.0:
+        transportR = meanInt_jnuc[i] / meanInt_Cell[i]
+        transportRall = meanInt_vsvgall[i] / meanInt_Cell[i]
+    else:
+        transportR = float('inf')
+        transportRall = float('inf')
+    rtjnucVSVG.setValue('TransportRatio', i, transportR)
+    rtallcellVSVG.setValue('TransportRatio', i, transportRall)
+    rtjnucVSVG.setValue('WellNumber', i, int(wnumber)) 
+    rtallcellVSVG.setValue('WellNumber', i, int(wnumber))
+    rtallcellPM.setValue('WellNumber', i, int(wnumber)) 
+
+rtallcellVSVG.show('AllCell')
+```
 
 ### Prescreening of Images.
 
