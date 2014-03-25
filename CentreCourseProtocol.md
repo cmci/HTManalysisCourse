@@ -49,7 +49,7 @@ Kota Miura (CMCI, EMBL)
   
 - Acknowledgements
   - Thanks to Fatima Verissimo, Faba Neumann, Rainer Pepperkok and Jean-Karim Hériché for providing data, sharing their experiences and giving advices on these data. 
-  - Thanks to Bernd Klaus, Matt Rogon and Aidan Budd (the course team) for ther effort in starting up this course and working together.   
+  - Thanks to Bernd Klaus, Matt Rogon and Aidan Budd (the course team) for their effort in starting up this course and working together.   
 
 ##Course Outline
 
@@ -66,17 +66,17 @@ Kota Miura (CMCI, EMBL)
 
 ## Introduction
 
-Image based screening (high content screening) is one of the modern methods for screening genes involved in a biological process. The main idea is to sytematically acquire a huge amount of data with various treatments, and try to isolate treatments that affects the target biological process. 
+Image based screening (high content screening) is one of the modern methods for screening genes involved in a biological process. The main idea is to systematically acquire a huge amount of data with various treatments, and try to isolate treatments that affects the target biological process. 
 
-Dataset we use in this course is from a scretory pathway screening. Proteins synthesized in endoplasmic reticulum are transported first to the Golgi, where proteins are added with modifications, and then to the plasma membrane or other desitned intracellular structures. 
+Dataset we use in this course is from a secretory pathway screening. Proteins synthesised in endoplasmic reticulum are transported first to the Golgi, where proteins are added with modifications, and then to the plasma membrane or other destined intracellular structures. 
 
-VSVG is a model protein used for studying this transport system and is a heat-sensitive protein.  This protein could beaccumulated in / released from ER by temperature shifting, to experimentally analyze the process of intracellular transport from ER to the plasma membrane. 
+VSVG is a model protein used for studying this transport system and is a heat-sensitive protein.  This protein could be accumulated in / released from ER by temperature shifting, to experimentally analyze the process of intracellular transport from ER to the plasma membrane. 
 
-To study the transport process, it is desirable to take time lapse sequence to follow the changes in VSVG localization within cell. However, it is sufficient to assess the transport process by taking a snapshot at a defined time point after releasing the protein from ER and check where the protein is located. In control condition, proteins should be localized in the plasma membrane after successful transports. If the transport out from the ER is interferred due to suppression of the component of transport, proteins should be stably located in the ER. Likewise, finding proteins in the Golgi suggests that transport machinary from Golgi to the plasma membrane is blocked. 
+To study the transport process, it is desirable to take time lapse sequence to follow the changes in VSVG localization within cell. However, it is sufficient to assess the transport process by taking a snapshot at a defined time point after releasing the protein from ER and check where the protein is located. In control condition, proteins should be localized in the plasma membrane after successful transports. If the transport out from the ER is interfered due to suppression of the component of transport, proteins should be stably located in the ER. Likewise, finding proteins in the Golgi suggests that transport machinery from Golgi to the plasma membrane is blocked. 
 
 With this snapshot strategy, it is possible to systematically prepare a set of siRNAs and drug treatments to test their effect on vesicle transport system: the high content image screening. 
 
-In this course, we will try to analyze all images from different types of treatments automatically, evaluate and compare the difference in the effeciency of transport. This COULD be done manually, but we have huge number of various treatments: approximately 700,000 of images to analyze. To not to end the rest of our life clicking images, we will completely automate the image processing and  analysis to extract transport parametes and output results as a huge list of parameter table. 
+In this course, we will try to analyze all images from different types of treatments automatically, evaluate and compare the difference in the efficiency of transport. This COULD be done manually, but we have huge number of various treatments: approximately 700,000 of images to analyze. To not to end the rest of our life clicking images, we will completely automate the image processing and  analysis to extract transport parameters and output results as a huge list of parameter table. 
 
 This table then is studied using statistical techniques to distinguish treatments that are largely affecting the transport system. 
 
@@ -120,7 +120,7 @@ Add the following line in your bash profile (.bash_profile).
 alias cluster='ssh -t <YOUR UNIX USERNAME>@submaster '\''bsub -M 5000 -Is bash'\'''
 ```
 
-By the way, this will allow you to execute the command below as an alias'cluster'
+By the way, this will allow you to execute the command below as an alias 'cluster'
 
 ```
 ssh -t <YOUR UNIX USERNAME>@submaster \bsub -M 5000 -Is bash
@@ -293,7 +293,7 @@ Options to run programs other than ImageJ:
  
 ## Methods (Image Analysis)
 
-As we are interested in the attenuation or the enhancement of the protein transport machinary from ER to the plasma membrane via the Golgi apparatus, we compare the protein density in ER, the Golgi and the plasma membrane. For this, we use three different images. 
+As we are interested in the attenuation or the enhancement of the protein transport machinery from ER to the plasma membrane via the Golgi apparatus, we compare the protein density in ER, the Golgi and the plasma membrane. For this, we use three different images. 
 
 The minimal detaset consists of three images:
 
@@ -316,11 +316,11 @@ We probably will not explain this part in detail, just show you how it was done.
 
 ###Nucleus Segmentation
 
-To measure these values, we first segment each nucleus using atutomatic local intensity thresholding (Bernsen algorithm). Then the rim of the nucleus is dilated outwards to define an approximate area to define the region of **Cell Area**. Within this region, we call the dilated region (Cell Area - Nucelus Area) as the **Juxta-Nuclear** cytoplasmic region. 
+To measure these values, we first segment each nucleus using automatic local intensity thresholding (Bernsen algorithm). Then the rim of the nucleus is dilated outwards to define an approximate area to define the region of **Cell Area**. Within this region, we call the dilated region (Cell Area - Nucleus Area) as the **Juxta-Nuclear** cytoplasmic region. 
 
 (Figure required here)
 
-By measuring the intensity ratio of those at the plasma membrane and those at the Golgi (the transport ratio **T**), we assess the effeciency of transport.
+By measuring the intensity ratio of those at the plasma membrane and those at the Golgi (the transport ratio **T**), we assess the efficiency of transport.
 
 ### Transport Ratio
 The transport ratio (T) calculated in Simpson (2007) is as follows:
@@ -360,7 +360,7 @@ Plates are numbered such that
 
 	plateID-Number--year-month-date
 
-For exmaple:
+For example:
 
 	0001-03--2005-08-01
 
@@ -369,6 +369,15 @@ This means that this is the plate ID 1, third experiment (same plate configurati
 Within each of these folders, images are stored under 
 	
 	data/
+
+###Example Image
+
+Example image set for learning image processing and analysis is in
+
+	/g/data/bio-it_centres_course/data/course
+
+There are three files from single spot in a plate. 
+
 
 ###Scripts
 
@@ -384,16 +393,22 @@ Prescreening script is
 
 	/g/almf/software/scripts2/listFocusedImagesV2.py
 	
-A script for generating job array written by Clemens Lankner is
+A script for generating job array written by Clemens Lakner is
 	
+	/g/data/bio-it_centres_course/data/VSVG/fiji-sub/fiji_script.sh
 	
+The code:
+
+<>
+
+
 ## Workflow: GUI
 
 The protocol below is described in Simpson (2007).
 
 ###Background subtraction 
 
-Background subtraction will only be done with PM and VSVG images. In the final script, the funciton name is **backgroundSubtraction**
+Background subtraction will only be done with PM and VSVG images. In the final script, the function name is **backgroundSubtraction**
 
 Get minimum and mean intensity of the image.
 
@@ -420,7 +435,7 @@ Subtract mean2 value from the image.
 
 ###nucleus segmentation
 
-Nucleus segmentration. We only do this with Dapi image. Corresponding function in the script is **nucleusSegmentation(imp2)**.
+Nucleus segmentation. We only do this with Dapi image. Corresponding function in the script is **nucleusSegmentation(imp2)**.
  
 	[Image > Type > 8bit]
 	[Process > Filters > Gaussian Blur...]
@@ -491,7 +506,7 @@ Filter original nulcues
      Visual inspection. We terminate analysis if there is no nucleus segmented. 
 
 
-###Generate nuclus ROIs from segmented nucleus. Store them as a list. 
+###Generate nucleus ROIs from segmented nucleus. Store them as a list. 
 
      [Image > Selection > Create Selection]
      [Image > Selection > Make Inverse]
@@ -523,7 +538,7 @@ Do measurements using modified ROIs (measureROIs).
      c. all cell VSVG intensity
 
 
-### Transport Effeciency
+### Transport Efficiency
 
 Calculate transport efficiency and add the results to results table. All results from single plate are merged and placed in a file, but we do not do this manually. 
 
@@ -535,7 +550,7 @@ Jython is Java-implemented Python, allowing us to access Java classes in Python 
 
 This command launches the editor and a new script file. 
 
-Script Editor has ist own menu, and one of them is 
+Script Editor has its own menu, and one of them is 
 
 	[Language > Python]
 	
@@ -543,7 +558,7 @@ To set the language to Python (Jython).
 
  The editor has two panels. Upper one is the input field, and the lower one is the output field. Output field has two types, standard output and error output. You could toggle this by clicking "error" or "output".
  
-We learn the basics of Python commands interactively. Below is a list of Python funtions we go over.
+We learn the basics of Python commands interactively. Below is a list of Python functions we go over.
 
 ````
 print
@@ -637,7 +652,7 @@ The double back-slash
 
 	\\ 
 
-is called escape sequence, and is a command send to the interpretor. Insted of printing the following string in the Log window, it is interpreted as a command. In case of "\\Clear", texts in the Log window will be cleared. 
+is called escape sequence, and is a command send to the interpreter. Instead of printing the following string in the Log window, it is interpreted as a command. In case of "\\Clear", texts in the Log window will be cleared. 
 
 ### Javadoc
 
@@ -645,9 +660,9 @@ Now, let's see a bit more of details about "IJ.log". Click the following link an
 
 [Javadoc - IJ](http://rsbweb.nih.gov/ij/developer/api/ij/IJ.html)
 
-This is a documentation called "Javadoc" and is a reference for all the functionality that an Java applicaiton has. It's **VERY IMPORTANT** to understand how to use this documentation, so I wll explain in details. 
+This is a documentation called "Javadoc" and is a reference for all the functionality that an Java application has. It's **VERY IMPORTANT** to understand how to use this documentation, so I wll explain in details. 
 
-ImageJ is a collection of many classes, and you could find all those classes in this javadoc. The web page has side bar in the left side, and it is separated to the upper and the lower panels. The upper panel has its title "Packages" and the bottle panel is "Classes". As I have already said, ImageJ is a colleciton of many classes - and they are all listed in the bottom panel. 
+ImageJ is a collection of many classes, and you could find all those classes in this Javadoc. The web page has side bar in the left side, and it is separated to the upper and the lower panels. The upper panel has its title "Packages" and the bottle panel is "Classes". As I have already said, ImageJ is a collection of many classes - and they are all listed in the bottom panel. 
 
 Since there are many classes, they are organized in hierarchical way by "packages". You could imagine each packages as a folder in file system. For example, you could find a package named "ij". It means something like a folder named "ij", and for a package "ij.plugin.filter", its a folder "filter" under a folder "plguin" within a folder "ij" (in fact, class files are located in file system in this way). 
 
@@ -667,17 +682,36 @@ When this code is executed, your machine will make a beep sound. In such a way a
 
 ###Loading and showing Image
 
-	imp = IJ.openImage('/Users/miura/image.tif')
-	
+One of methods available in class IJ is openImage(path). Check it's javadoc information ([Javadoc]()). It says:
+
+> **openImage**
+
+> public static ImagePlus openImage(java.lang.String path)
+
+> Opens the specified file as a tiff, bmp, dicom, fits, pgm, gif or jpeg image and returns an ImagePlus object if successful. Calls HandleExtraFileTypes plugin if the file type is not recognised. Displays a file open dialog if 'path' is null or an empty string. Note that 'path' can also be a URL. Some reader plugins, including the Bio-Formats plugin, display the image and return null.
+
+It loads an image from a file in the ***path***, and returns an ImagePlus object (we will study more about object, or *instance* in below).
+
+	imp = IJ.openImage('/g/data/bio-it_centres_course/data/course/--W00005--P00001--Z00000--T00000--dapi.tif')
 	imp.show()
+
+*imp* now points to the loaded image, and is an instance of class ImagePlus. The ImagePlus holds image itself (pixel data) and metadata (such as its size, image name, units and so on). Check ImagePlus Javadoc
+
+[ImagePlus](http://rsbweb.nih.gov/ij/developer/api/ij/ImagePlus.html)
+
+It has many methods, and one of them is `show()`, which creates a windows and displays image on your desktop. 
 	
 ###Class ImagePlus
 
+We study what we could get from the instance of ImagePlus object (the imp we got by loading image file). 
 
 * imp.getTitle()
-* imp.deleteRoi()
-* imp.setRoi()
+  * add a line  `print imp.getTitle()`
 * imp.duplicate()
+  * add two lines `imp2 = imp.duplicate()` then `imp2.show()`
+  * imp2 will be a duplicate of the imp image. 
+* imp.deleteRoi() 
+* imp.setRoi()
 * imp.getProcessor()
 
 ###Class ImageProcessor
@@ -699,27 +733,39 @@ When this code is executed, your machine will make a beep sound. In such a way a
 
 ###Constructing an Object
 
-So far, I have not explained an important difference in types of methods: There are static and non-static methods. If you see the Javadoc of class IJ, you will see that all methods of this class has "static" as its property. This means that you could use those methods by appending the name of the method directly after name of the class. 
+So far, I have not explained an important difference in types of methods: There are static and non-static methods. If you see the Javadoc of class IJ, you will see that all methods of this class has "static" as their property. This means that you could use those methods by appending the name of the method directly after name of the class, such as IJ.log() and IJ.beep(). 
 
-With none static methods, this is not possible. For example, the class ImagePlus has many methods such as "getHeight()", which is to get the height of the image. If you try to do 
+In contrast, this is not possible with non-static methods. For example, the class ImagePlus has many methods such as "getHeight()", which is to get the height of the image. If you try to do 
 
-	ptint ImagePlus.getHeight()
+	print ImagePlus.getHeight()
 
-It will not work. This is simply because we (and mainly the computer) do not know which image we are talkling about. Instead we must use a specific **instance** of image, such as the one you grabbed by IJ.openImage(). Remember, 
+It will not work and returns an error. This is simply because we (and mainly the computer) do not know which image that we asking for its height. Instead we must use a specific **instance** of image, such as the one you retrieve by IJ.openImage(). Remember, 
 
 	imp = IJ.openImage('/Users/miura/image.tif')
 	
-This "imp" is a specific instance of image because we know that we loaded the image from a specific file and we now call it as "imp". ImagePlus is a class, but never becomes existing until it is "constucted" by loading an image from a file or creating a image from scratch or grabbing a image that is opened on desktop. 
+This "imp" is a specific instance of image because we know that we loaded the image from a specific file. ImagePlus is a class, but never becomes existing until it is "constructed" by loading an image from a file or creating a image from scratch or grabbing a image that is opened on desktop. 
 
 Classes that became into existing entity is called an "Instance" or "Object". None static methods work only when an instance is there. 
 
-Many of the methods actually do not have meaning if a specific instance is not there, just because there are Classes for processing images. For instance, GaussianBlur is a class that does Gaussian blurring. It's methods are all none static but one, and for these non-static methods to work, an instance of GaussianBlur class should be constucted first. 
+Coming back to the static methods of class IJ, their functions are those that does need a presence of specific instance, but only does a general job to any instance or without an instance. In case of IJ.log, we know that there is only one Log window so we do not need to specify an instance. IJ.beep or IJ.openImage as well. 
+
+In case of images, we know that there could be many different instances of images such as a image from channel 1 and another image from channel2. Though they all belong to a same ImagePlus class, they are different instances of ImagePlus.  
+
+GaussianBlur is a class that does Gaussian blurring. It's methods are all none static but one, and for these non-static methods to work, an instance of GaussianBlur class should be constructed first. 
 
 	gb = GaussianBlur() //Constructs an instance of Gaussian Blur object
 
-You could see how to constuct an instance in the "constructor summary" in the Javadoc. 
+You could see how to construct an instance in the "constructor summary" in the Javadoc.
 
+Now the actual object of GaussianBlur, gb, is available, you could blur an image by using a method
 
+	blurGaussian(ImageProcessor ip, double sigmaX, double sigmaY, double accuracy) 
+	
+which would look like 
+
+	gb.blurGaussian(imp.getProcessor, 2.0, 2.0, 0.02)
+
+Similarly, many classes for processing and analysis works only after constructing its instance. Here is another example, using a class ProfilePlot.
 
 	imp = IJ.getImage()
 	pf = ProfilePlot(imp)
@@ -727,7 +773,23 @@ You could see how to constuct an instance in the "constructor summary" in the Ja
 	for val in profile:
 		print val
 		
-We combine this with the python package csv to write the output to a comma separated value text file. 
+The second line of this code is the constructor that creates an instance of class ProfilePlot.The constructor in this case uses an argument. See the [Javadoc](http://rsbweb.nih.gov/ij/developer/api/ij/gui/ProfilePlot.html). The class ProfilePlot has three different constructors. 
+
+* ProfilePlot() 
+* ProfilePlot(ImagePlus imp) 
+* ProfilePlot(ImagePlus imp, boolean averageHorizontally)
+
+We could use any of these three constructors. The most basic one would be  
+
+	pf = ProfilePlot()
+
+but then we have not specified an image where we get the intensity profile. This is not usable at all. For this reason, we use 
+
+	pf = ProfilePlot(imp)
+
+to specify the image that we want to work on in the constructor. 
+	
+We now combine the above code with the python package csv to write the output to a comma separated value text file. 
 
 	import csv
 	
