@@ -763,9 +763,19 @@ Coming back to the static methods of class IJ, their functions are those that do
 
 In case of images, we know that there could be many different instances of images such as a image from channel 1 and another image from channel2. Though they all belong to a same ImagePlus class, they are different instances of ImagePlus.  
 
-GaussianBlur is a class that does Gaussian blurring. It's methods are all none static but one, and for these non-static methods to work, an instance of GaussianBlur class should be constructed first. 
+GaussianBlur is a class that does Gaussian blurring. It's methods are all none static but one, and for these non-static methods to work, an instance of GaussianBlur class should be constructed first. It's also that this class should be imported before it is being in use. Use 
 
-	gb = GaussianBlur() //Constructs an instance of Gaussian Blur object
+    from [package name] import [class name]
+    
+to do so. If this class is not explicitly imported and used, there will be an error message:
+
+>ImportError: cannot import name GaussianBlur
+
+	# import class explicitly
+	from ij.plugin.filter import GaussianBlur
+    
+	#Constructs an instance of Gaussian Blur object
+	gb = GaussianBlur()
 
 You could see how to construct an instance in the "constructor summary" in the Javadoc.
 
@@ -775,15 +785,38 @@ Now the actual object of GaussianBlur, gb, is available, you could blur an image
 	
 which would look like 
 
-	gb.blurGaussian(imp.getProcessor, 2.0, 2.0, 0.02)
+	gb.blurGaussian(imp.getProcessor(), 5.0, 5.0, 0.02)
 
-Similarly, many classes for processing and analysis works only after constructing its instance. Here is another example, using a class ProfilePlot.
+The code for loading an image and do GaussianBlur filtering would look like this:
 
-	imp = IJ.getImage()
-	pf = ProfilePlot(imp)
-	profile = pf.getProfile()
-	for val in profile:
-		print val
+```python
+#Loading image
+import os
+
+root = '/Volumes/data/bio-it_centres_course/data/course'
+filename = '--W00005--P00001--Z00000--T00000--dapi.tif'
+fullpath = os.path.join(root, filename)
+imp = IJ.openImage(fullpath)
+
+# Until here, it's all the same.
+# import class explicitly
+from ij.plugin.filter import GaussianBlur
+
+# Construct an instance of Gaussian Blur object 
+gb = GaussianBlur() 
+gb.blurGaussian(imp.getProcessor(), 5.0, 5.0, 0.02)
+imp.show()
+
+```
+Similarly, many classes for processing and analysis works only after constructing its instance. Here is another example, using a class ProfilePlot. Before running this code, please open an image on your desktop, place a line ROI. 
+
+```python
+imp = IJ.getImage()
+pf = ProfilePlot(imp)
+profile = pf.getProfile()
+for val in profile:
+    print val
+```
 		
 The second line of this code is the constructor that creates an instance of class ProfilePlot.The constructor in this case uses an argument. See the [Javadoc](http://rsbweb.nih.gov/ij/developer/api/ij/gui/ProfilePlot.html). The class ProfilePlot has three different constructors. 
 
