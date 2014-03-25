@@ -1375,3 +1375,111 @@ Prescreen results are saved under
 	
 ## Final Code
 
+Assemblying all the fragments as a single script, here is the final code to submit. 
+
+<https://github.com/cmci/HTManalysisCourse/blob/master/measTransportBatch3.py>
+
+An important command that appears only here is 'sys.argv`, which holds the argment added in the command line. Try the following to see what is happening. 
+
+ Create a file 'testargv.py' with following code. 
+
+```python
+import sys
+print 'The argument given: ', sys.argv
+```
+
+Save the file, then run it from the command line. 
+
+```
+fiji --mem1000m testargv.py testarg1 testarg2
+```
+The output should look like
+
+```
+miura@compute-n026<19>
+[/g/data/bio-it_centres_course/data/course ]
+fiji --mem=2000m testargv.py testarg1 testarg2
+
+No GUI detected.  Falling back to headless mode.
+No GUI detected.  Falling back to headless mode.
+the argument givien:  ['testargv.py', 'testarg1', 'testarg2']
+```
+
+Within the running jython instance, command line arguments are passed to the program via sys.argv. In our case, we pass name of the plate to process to the script.
+
+##Generating Job Array
+
+Here is the code written by Clemens. 
+
+<https://github.com/cmci/HTManalysisCourse/blob/master/fiji_script.sh>
+
+```sh
+#!/bin/bash -e
+# Read-only filesystem error occurs sometimes
+#     Appears to be due to mounting issues or file system limitations
+#     Retry if it occurs
+BASE_DIR="/g/data/bio-it_centres_course/data/VSVG"
+SUB_DIR="${BASE_DIR}/fiji-sub"
+LOG_DIR="${BASE_DIR}/fiji-log"
+PRE_DIR="${BASE_DIR}/prescreen"
+# The first version of the python script gave an error for some plates
+#JYTHON_SCRIPT="/g/almf/software/scripts2/measTransportBatch.py"
+#JYTHON_SCRIPT="/g/almf/software/scripts2/measTransportBatch2.py"
+JYTHON_SCRIPT="/g/almf/software/scripts2/measTransportBatch3.py"
+
+cd ${BASE_DIR}
+[ -d fiji-sub ] || mkdir fiji-sub
+[ -d fiji-log ] || mkdir fiji-log
+[ -d fiji-out ] || mkdir fiji-out
+
+for a in `ls ${BASE_DIR} | grep "\-\-"`
+do
+    PLATE=${a}
+
+    # Check if prescreen exists
+    if [ ! -f ${PRE_DIR}/${PLATE}.csv ]; then
+        echo "Skipping plate ${PLATE}: no pre-screen data."
+        continue
+    fi
+    OO="${LOG_DIR}/${PLATE}-out.txt"
+    EO="${LOG_DIR}/${PLATE}-err.txt"
+    TARGET_DIR="${PLATE}"
+    OUTPUT_DIR="fiji-out"
+
+    # Continue if output already exists - no need to re-run
+    if [ -f ${OUTPUT_DIR}/${PLATE}--PMall.csv ]; then
+        echo "Skipping plate ${PLATE}: results already exist."
+        continue
+    fi
+
+    # Write the bsub script
+    echo "#!/bin/bash
+#BSUB -oo \"${OO}\"
+#BSUB -eo \"${EO}\"
+#BSUB -M 8000
+#BSUB -R select[mem>8000] -R rusage[mem=8000]
+ulimit -c 0
+export PATH=/g/almf/software/bin2:\${PATH}
+echo \"The job started:\"
+java -version
+JYTHON_SCRIPT=${JYTHON_SCRIPT}
+TARGET_DIR=${TARGET_DIR}
+OUTPUT_DIR=${OUTPUT_DIR}
+echo \"Fiji started:\"
+fiji --headless --mem=1000m ${JYTHON_SCRIPT} ${TARGET_DIR} ${OUTPUT_DIR}" > ${SUB_DIR}/${PLATE}.bsub
+
+    # Submit the job to the cluster
+    chmod +x ${SUB_DIR}/${PLATE}.bsub
+    bsub < ${SUB_DIR}/${PLATE}.bsub
+done
+
+```
+
+
+
+
+
+
+
+
+
