@@ -2,6 +2,8 @@
 
 BioIT-EMBL Centres Joint Training Week, Mar. 26, 2014
 
+Place: ATC Computer Teaching Lab
+
 Kota Miura (CMCI, EMBL)
 
 - [Course Web Page](https://bio-it.embl.de/joint-training) (only internal access)
@@ -89,8 +91,16 @@ Followings are the literatures published with this dataset.
 - Simpson, J.C., Joggerst, B., Laketa, V., Verissimo, F., Cetin, C., Erfle, H., Bexiga, M.G., Singan, V.R., Hériché, J.-K., Neumann, B., Mateos, A., Blake, J., Bechtel, S., Benes, V., Wiemann, S., 
 Ellenberg, J., Pepperkok, R., 2012. Genome-wide RNAi screening identifies human proteins with a regulatory function in the early secretory pathway. Nat. Cell Biol. 14, 764–74. <http://www.ncbi.nlm.nih.gov/pubmed/22660414>
 
-## Configuration for March 24
+## Configuration for March 26, 2014
 
+Here is what you should do to use Fiji locally and via network. We learn GUI and scripting using local Fiji (one that you will install in your machine) and the network Fiji (resides in ALMF server and run it headlessly using command line). 
+
+In brief, 
+
+* For desktop Fiji, you just need to download the installer. 
+* For the network Fiji, you need to set path both for the network Fiji and Java virtual machine (Java should be 1.6).
+
+Just a note: if you try to run Fiji from sshint.embl.de, it fails because the Java version there is 1.4. 
 
 ### Install Fiji on your desktop
 
@@ -620,7 +630,9 @@ Codes used in this interactive session is in
 
 For more information, see
 
-<http://www.jython.org/docs/library/indexprogress.html><http://www.jython.org/docs/library/functions.html>
+<http://www.jython.org/docs/library/indexprogress.html>
+
+<http://www.jython.org/docs/library/functions.html>
 
 
 ## Workflow: Fiji Jython Scripting
@@ -807,13 +819,216 @@ We now combine the above code with the python package csv to write the output to
 
 ## Workflow: Implementing Image Analysis
 
-### Prescreening of Images.
+### Background Subtraction for VSVG and PM images. 
 
-<https://gist.github.com/cmci/9684453>
+Now we start implementing the image processing & analysis of image data. We do this step by step - meaning write several lines, execute to test and then if it's successful, we go on to write more.
 
-Prescreen results are saved under
+Let's first set the path to the image file and load it. We've done this already, so you should be able to understand this.
 
-	/g/data/bio-it_centres_course/data/VSVG/prescreen
+```python
+import os
+
+#path information
+root = '/g/data/bio-it_centres_course/data/course'
+filepm = '--W00005--P00001--Z00000--T00000--pm-647.tif'
+filevsvg = '--W00005--P00001--Z00000--T00000--vsvg-sfp.tif'
+fullpath = os.path.join(root, filepm)
+
+#Load an image
+imp = IJ.openImage(fullpath)
+imp.show()
+```
+
+We then get the ImageProcessor object of the current ImagePlus object and do the statistics to get minimum and mean intensity of the current image.
+
+```
+#Get the ImageProcessor object of current image
+ip = imp.getProcessor()
+
+#Get ImageStatistics object of current ImageProcessor Object
+impstats = ip.getStatistics()
+
+#Get rtatistics results
+ipmin = impstats.min
+ipmean = impstats.mean
+```
+**getStatistics** method returns an ImageStatistics object which does statistical calculations and holds the results. All of these results can be diretly accessed as field values (field values - this is new in this tutorial). You could also get other statistics results, which are listed as "Field Summary" of its Javadoc:
+
+<http://rsbweb.nih.gov/ij/developer/api/ij/process/ImageStatistics.html>
+
+You could test to print out some of these values.
+```
+print 'Median:', impstats.median
+print 'SD:', impstats.stdDev
+print 'Histogram:', impstats.histogram
+```
+
+Note that the field 'histogram' returns a list. Note also that fields labeled "protected" cannot be accessed.
+
+We now know the mimimum and the mean pixel values, so we select the region bounded by these lower and upper values. We do intensity threshold.
+
+```
+ip.setThreshold(ipmin, ipmean, ImageProcessor.RED_LUT)
+```
+
+setThreshold is a method of class ImageProcessor and has three arguments. 
+
+1. lower threhsold value
+2. upper threshold value
+3. lut update (a number)
+
+THe first and the second arguments are obvious what they are, but the third one probably is not. This value determines the highlighting color of thresholded area. There are three different ways:
+
+1. red (RED_LUT, 0)
+2. black and white (BLACK_AND_WHITE_LUT, 1)
+3. no update (NO_LUT_UPDATE, 2)
+4. green and blue (OVER_UNDER_LUT, 3)
+
+So if you want red highlighted area, then you could put 0 a s the third argument. 
+
+How could we know such options are there? They are actually listed as constant field values:
+
+<http://rsbweb.nih.gov/ij/developer/api/constant-values.html#ij.process.ImageProcessor.RED_LUT>
+
+They are a special type of field values associated with class ImageProcessor and hold constant values. For example, ImageProcessor.RED_LUT is 0. Check this by running the floowing code.
+
+```
+print ImageProcessor.RED_LUT
+print ImageProcessor.BLACK_AND_WHITE_LUT
+print ImageProcessor.NO_LUT_UPDATE
+print ImageProcessor.OVER_UNDER_LUT
+```
+
+Key point here is that these field values have a very descriptive name of what they are doing. This allows the programmer to easily select one of the options of how highlighting will appear as the result of intensity thresholding.
+
+In our case we do not care because we don't need to check the thresholded area visually. However, only because the setThreshold method needs a third argument, we set it to a default value.
+
+We now measure the pixel values only those which were selected by this thresholding. For measurement, we now use [the getSatistics method of ImageStatistics class](http://rsbweb.nih.gov/ij/developer/api/ij/process/ImageStatistics.html#getStatistics(ij.process.ImageProcessor, int, ij.measure.Calibration)):
+
+> static ImageStatistics	getStatistics(ImageProcessor ip, int mOptions, Calibration cal)
+
+From this, we understand that 
+
+* This is a static method so we can use it directly without constructing an instance. 
+* It returns an ImageSatistics object.
+* There are three arguments:
+  1. An image processor object
+  2. measurement options, a number
+  3. Calibration object
+
+The first one is obvious, the image that we are working on. The second is a specific number that sets the measurement option.
+Looking through [the Javadoc of ImageStatistics class](http://rsbweb.nih.gov/ij/developer/api/ij/process/ImageStatistics.html), you will find a small table of "Fields inherited from interface ij.measure.Measurements". They are listed in the constant field value table. 
+
+<http://rsbweb.nih.gov/ij/developer/api/constant-values.html#ij.measure.Measurements.AREA>
+
+As we want to get a mean value of thresholded area, we need to have the option
+
+ImageStatistics.MEAN
+
+At the same time, we also need to set the statistics to be computed only from thresholded area so 
+
+ImageStatistics.LIMIT
+
+We add thise values to get a specific number that set these options active.
+
+```python
+#set measurement option
+measOpt = ImageStatistics.MEAN + ImageStatistics.LIMIT
+
+#get statistics of thresholded area
+impstats = ImageStatistics.getStatistics(ip, measOpt, None)
+```
+As we do not need calibration, we set it to null (in Java) or None (in Python).
+
+Now the measurement is done so we can use the measured mean intensity to subtrat it from image (background subtraction, finally)
+```
+backlevel = impstats.mean
+
+ip.resetThreshold()
+
+# subtract background level
+ip.subtract(backlevel)
+print imp.getTitle(), " : background intensity - ", backlevel
+```
+
+Taking all thise fragments into one, we now have a script that does background subtraction. 
+
+
+```python
+import os
+
+#path information
+root = '/g/data/bio-it_centres_course/data/course'
+filepm = '--W00005--P00001--Z00000--T00000--pm-647.tif'
+filevsvg = '--W00005--P00001--Z00000--T00000--vsvg-sfp.tif'
+fullpath = os.path.join(root, filepm)
+
+#Load an image
+imp = IJ.openImage(fullpath)
+imp.show()
+
+#Get ImageProcessor object of current image
+ip = imp.getProcessor()
+
+#Get ImageStatistics object of current ImageProcessor Object
+impstats = ip.getStatistics()
+
+#Get rtatistics results
+ipmin = impstats.min
+ipmean = impstats.mean
+
+#lower threshold = minimal intensity
+#upper threshold = mean intensity
+ip.setThreshold(ipmin, ipmean, ImageProcessor.RED_LUT)
+
+#set measurement option
+measOpt = ImageStatistics.MEAN + ImageStatistics.LIMIT
+
+#get statistics of thresholded area
+impstats = ImageStatistics.getStatistics(ip, measOpt, None)
+backlevel = impstats.mean
+
+ip.resetThreshold()
+
+# subtract background level
+ip.subtract(backlevel)
+print imp.getTitle(), " : background intensity - ", backlevel
+```
+
+In this code, only plasma membrane image is processed. To do the background subtraction for VSVG image, we could duplicate the code and replace the path for "IJ.openImage(path)", but a smarter way of this is to create a function like below.
+
+```python
+import os
+
+root = '/Volumes/data/bio-it_centres_course/data/course'
+filepm = '--W00005--P00001--Z00000--T00000--pm-647.tif'
+filevsvg = '--W00005--P00001--Z00000--T00000--vsvg-cfp.tif'
+
+def backSub(imp):
+    imp.show()
+    ip = imp.getProcessor()
+    impstats = ip.getStatistics()
+    ipmin = impstats.min
+    ipmean = impstats.mean
+    #ipmax = impstats.max 
+    ip.setThreshold(ipmin, ipmean, ImageProcessor.RED_LUT)
+    measOpt = ImageStatistics.MEAN + ImageStatistics.LIMIT
+    impstats = ImageStatistics.getStatistics(ip, measOpt, None)
+    backlevel = impstats.mean
+    ip.resetThreshold()
+    ip.subtract(backlevel)
+    print imp.getTitle(), " : background intensity - ", backlevel
+
+fullpath = os.path.join(root, filepm)
+imp = IJ.openImage(fullpath)
+backSub(imp)
+
+fullpath = os.path.join(root, filevsvg)
+imp = IJ.openImage(fullpath)
+backSub(imp)
+```
+
+
 
 ### Nucleus segmentation
 
@@ -831,5 +1046,15 @@ This script segments nucleus.
 
 #### Haralick Features
 
+### Prescreening of Images.
+
+We will not go over the details of full processing, but the prescreening code is a good example of accessing multiple files and process images. 
+
+<https://gist.github.com/cmci/9684453>
+
+Prescreen results are saved under
+
+	/g/data/bio-it_centres_course/data/VSVG/prescreen
+	
 ## Final Code
 
