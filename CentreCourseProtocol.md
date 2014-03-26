@@ -521,9 +521,9 @@ Filter original nulcues
 
 ###Generate nucleus ROIs from segmented nucleus. Store them as a list. 
 
-     [Image > Selection > Create Selection]
-     [Image > Selection > Make Inverse]
-     [Image > Selection > To ROImanager]
+     [Edit > Selection > Create Selection]
+     [Edit > Selection > Make Inverse]
+     [Edit > Selection > To ROImanager]
 
 ###Roi modifications
 
