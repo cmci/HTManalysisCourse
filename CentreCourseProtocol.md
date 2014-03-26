@@ -25,7 +25,7 @@ Kota Miura (CMCI, EMBL)
 - [Workflow: GUI](#workflow-gui)
 - [Workflow: Python Primer](#workflow-python-primer)
 - [Workflow: Fiji Jython Scripting](#workflow-fiji-jython-scripting)
-- [Workflow: Implementing Image Analysis](#workflow-mplementing-image-analysis)
+- [Workflow: Implementing Image Analysis](#workflow-implementing-image-analysis)
 - [Final Code](#final-code)
 - [Generating Job Array](#generating-job-array)
 
@@ -1259,6 +1259,13 @@ impfilteredNuc.show()
 
 
 ### ROI generator, Measurements & Transport Ratio
+
+* Accessing ResultsTable, read and write
+* ParticleAnalysis class
+* from x import y as z
+* ROI, ShapeRoi classes
+* Implementing Java Interface
+* ImageCalculator class
 
 ```python
 import os, sys
