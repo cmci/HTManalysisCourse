@@ -1409,6 +1409,12 @@ the argument givien:  ['testargv.py', 'testarg1', 'testarg2']
 
 Within the running Jython instance, command line arguments are passed to the program via sys.argv. In our case, we pass name of the plate to process to the script.
 
+As an example, if you want to process the first plate (0001-03--2005-08-01) and save outputs (measurements) to a folder named 'out_kota', the command will be
+```
+fiji --mem2000m 0001-03--2005-08-01 out_kota
+```
+As there is no line in the script to create a new folder, 'out_kota' should be created manually before doing this. If there is any problem with memory, try increasing it a bit, such as `--mem2500m` or so. 
+
 ##Generating Job Array
 
 Here is the code written by Clemens. 
