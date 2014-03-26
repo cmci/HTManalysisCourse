@@ -25,6 +25,7 @@ Kota Miura (CMCI, EMBL)
 - [Workflow: GUI](#workflow-gui)
 - [Workflow: Python Primer](#workflow-python-primer)
 - [Workflow: Fiji Jython Scripting](#workflow-fiji-jython-scripting)
+- [Workflow: Implementing Image Analysis](#workflow-mplementing-image-analysis)
 - [Final Code](#final-code)
 - [Generating Job Array](#generating-job-array)
 
