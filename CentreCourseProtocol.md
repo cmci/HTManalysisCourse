@@ -24,7 +24,9 @@ Kota Miura (CMCI, EMBL)
   - [Scripts](#scripts)  
 - [Workflow: GUI](#workflow-gui)
 - [Workflow: Python Primer](#workflow-python-primer)
-- [Workflow: Fiji Jython Scripting](#workflow:-fiji-jython-scripting)
+- [Workflow: Fiji Jython Scripting](#workflow-fiji-jython-scripting)
+- [Final Code](#final-code)
+- [Generating Job Array](#generating-job-array)
 
 
 ## Instructors
@@ -305,7 +307,7 @@ Options to run programs other than ImageJ:
 
 As we are interested in the attenuation or the enhancement of the protein transport machinery from ER to the plasma membrane via the Golgi apparatus, we compare the protein density in ER, the Golgi and the plasma membrane. For this, we use three different images. 
 
-The minimal detaset consists of three images:
+The minimal dataset consists of three images:
 
 1. Dapi signal: nucleus image
 2. cy3 signal: VSVG signal
@@ -930,7 +932,7 @@ impstats = ip.getStatistics()
 ipmin = impstats.min
 ipmean = impstats.mean
 ```
-**getStatistics** method returns an ImageStatistics object which does statistical calculations and holds the results. All of these results can be diretly accessed as field values (field values - this is new in this tutorial). You could also get other statistics results, which are listed as "Field Summary" of its Javadoc:
+**getStatistics** method returns an ImageStatistics object which does statistical calculations and holds the results. All of these results can be directly accessed as field values (field values - this is new in this tutorial). You could also get other statistics results, which are listed as "Field Summary" of its Javadoc:
 
 <http://rsbweb.nih.gov/ij/developer/api/ij/process/ImageStatistics.html>
 
@@ -943,7 +945,7 @@ print 'Histogram:', impstats.histogram
 
 Note that the field 'histogram' returns a list. Note also that fields labeled "protected" cannot be accessed.
 
-We now know the mimimum and the mean pixel values, so we select the region bounded by these lower and upper values. We do intensity threshold.
+We now know the minimum and the mean pixel values, so we select the region bounded by these lower and upper values. We do intensity threshold.
 
 ```
 ip.setThreshold(ipmin, ipmean, ImageProcessor.RED_LUT)
@@ -951,9 +953,9 @@ ip.setThreshold(ipmin, ipmean, ImageProcessor.RED_LUT)
 
 setThreshold is a method of class ImageProcessor and has three arguments. 
 
-1. lower threhsold value
+1. lower threshsold value
 2. upper threshold value
-3. lut update (a number)
+3. LUT update (a number)
 
 THe first and the second arguments are obvious what they are, but the third one probably is not. This value determines the highlighting color of thresholded area. There are three different ways:
 
@@ -968,7 +970,7 @@ How could we know such options are there? They are actually listed as constant f
 
 <http://rsbweb.nih.gov/ij/developer/api/constant-values.html#ij.process.ImageProcessor.RED_LUT>
 
-They are a special type of field values associated with class ImageProcessor and hold constant values. For example, ImageProcessor.RED_LUT is 0. Check this by running the floowing code.
+They are a special type of field values associated with class ImageProcessor and hold constant values. For example, ImageProcessor.RED_LUT is 0. Check this by running the following code.
 
 ```
 print ImageProcessor.RED_LUT
@@ -977,7 +979,7 @@ print ImageProcessor.NO_LUT_UPDATE
 print ImageProcessor.OVER_UNDER_LUT
 ```
 
-Key point here is that these field values have a very descriptive name of what they are doing. This allows the programmer to easily select one of the options of how highlighting will appear as the result of intensity thresholding.
+The key point here is that these field values have a very descriptive name of what they are doing. This allows the programmer to easily select one of the options of how highlighting will appear as the result of intensity thresholding.
 
 In our case we do not care because we don't need to check the thresholded area visually. However, only because the setThreshold method needs a third argument, we set it to a default value.
 
@@ -1019,7 +1021,7 @@ impstats = ImageStatistics.getStatistics(ip, measOpt, None)
 As we do not need calibration, we set it to null (in Java) or None (in Python).
 
 Now the measurement is done so we can use the measured mean intensity to subtrat it from image (background subtraction, finally)
-```
+```python
 backlevel = impstats.mean
 
 ip.resetThreshold()
@@ -1375,11 +1377,11 @@ Prescreen results are saved under
 	
 ## Final Code
 
-Assemblying all the fragments as a single script, here is the final code to submit. 
+Assembling all the fragments as a single script, here is the final code to submit. 
 
 <https://github.com/cmci/HTManalysisCourse/blob/master/measTransportBatch3.py>
 
-An important command that appears only here is 'sys.argv`, which holds the argment added in the command line. Try the following to see what is happening. 
+An important command that appears only here is 'sys.argv`, which holds the argument added in the command line. Try the following to see what is happening. 
 
  Create a file 'testargv.py' with following code. 
 
@@ -1405,7 +1407,7 @@ No GUI detected.  Falling back to headless mode.
 the argument givien:  ['testargv.py', 'testarg1', 'testarg2']
 ```
 
-Within the running jython instance, command line arguments are passed to the program via sys.argv. In our case, we pass name of the plate to process to the script.
+Within the running Jython instance, command line arguments are passed to the program via sys.argv. In our case, we pass name of the plate to process to the script.
 
 ##Generating Job Array
 
