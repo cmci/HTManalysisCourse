@@ -140,7 +140,7 @@ ssh -t <YOUR UNIX USERNAME>@submaster \bsub -M 5000 -Is bash
 ```
 If you have time, try the above command directly and see that it works. 
 
-Reload the .bash_profle by 
+Reload the .bash_profile by 
 
 ```
 source .bash_profile
@@ -172,10 +172,10 @@ nano ~/.bash_profile
 
 ```
 
-Otherwise, it might be able to edit the .bash_profile directly from your course linux machine. 
+Otherwise, it might be able to edit the .bash_profile directly from your course Linux machine. 
 
 
-Add the follwoing lines in your .bash_profile
+Add the following lines in your .bash_profile
 
 ```
 export PATH=/g/software/bin:$PATH
@@ -210,7 +210,7 @@ Java(TM) SE Runtime Environment (build 1.6.0_45-b06)
 Java HotSpot(TM) 64-Bit Server VM (build 20.45-b01, mixed mode)
 ```
 
-If your java version is OK (same as above), then 
+If your Java version is OK (same as above), then 
 
 ```
 fiji --help
@@ -316,14 +316,14 @@ The minimal dataset consists of three images:
 
 Dapi signal is used for locating individual cells and marking them. VSVG signal tells us where the VSVG protein is located within the cell. When they are at the Golgi, they are concentrated close to the nucleus. When they are in ER and the plasma membrane, they are evenly distributed within the cell. To check the VSVG protein specifically localized to the plasma membrane, the third image from immunostaining of the VSVG protein is used: the signal only appears when the protein is exposed to the extracellular space.
 
-###Prescreening
+###Pre-screening
 
 There are bad images just because of simple failures during acquisition, such as
 
 - out of focus
 - over exposure
 
-We exclude these images by prescreening images. Standard deviation of pixel intensity in each image is measured, and those with extreme values will be excluded from the analysis. For this, a black list of file names which will be used in the main analysis is created.
+We exclude these images by pre-screening images. Standard deviation of pixel intensity in each image is measured, and those with extreme values will be excluded from the analysis. For this, a black list of file names which will be used in the main analysis is created.
 
 We probably will not explain this part in detail, just show you how it was done.  
 
@@ -402,7 +402,7 @@ To process a plate, for example the first plate '0001-03--2005-08-01', the plate
 
 	fiji --headless --mem=1000m /g/almf/software/scripts2/measTransportBatch3.py '0001-03--2005-08-01'
    
-Prescreening script is 
+Pre-screening script is 
 
 	/g/almf/software/scripts2/listFocusedImagesV2.py
 	
@@ -508,7 +508,7 @@ Particle analysis 2 (remove outlier)
      
 	output: the mask. rename it as impDilatedNuc
 
-Filter original nulcues
+Filter original nucleus
 
      [Process > Image Calculator …]
           AND operation for impNuc and impDilatedNuc
@@ -954,18 +954,18 @@ ip.setThreshold(ipmin, ipmean, ImageProcessor.RED_LUT)
 
 setThreshold is a method of class ImageProcessor and has three arguments. 
 
-1. lower threshsold value
+1. lower threshold value
 2. upper threshold value
 3. LUT update (a number)
 
-THe first and the second arguments are obvious what they are, but the third one probably is not. This value determines the highlighting color of thresholded area. There are three different ways:
+The first and the second arguments are obvious what they are, but the third one probably is not. This value determines the highlighting color of thresholded area. There are three different ways:
 
 1. red (RED_LUT, 0)
 2. black and white (BLACK_AND_WHITE_LUT, 1)
 3. no update (NO_LUT_UPDATE, 2)
 4. green and blue (OVER_UNDER_LUT, 3)
 
-So if you want red highlighted area, then you could put 0 a s the third argument. 
+So if you want red highlighted area, then you could put 0 as the third argument. 
 
 How could we know such options are there? They are actually listed as constant field values:
 
@@ -1010,7 +1010,7 @@ At the same time, we also need to set the statistics to be computed only from th
 
 ImageStatistics.LIMIT
 
-We add thise values to get a specific number that set these options active.
+We add these values to get a specific number that set these options active.
 
 ```python
 #set measurement option
@@ -1021,7 +1021,7 @@ impstats = ImageStatistics.getStatistics(ip, measOpt, None)
 ```
 As we do not need calibration, we set it to null (in Java) or None (in Python).
 
-Now the measurement is done so we can use the measured mean intensity to subtrat it from image (background subtraction, finally)
+Now the measurement is done so we can use the measured mean intensity to subtract it from image (background subtraction, finally)
 ```python
 backlevel = impstats.mean
 
@@ -1032,7 +1032,7 @@ ip.subtract(backlevel)
 print imp.getTitle(), " : background intensity - ", backlevel
 ```
 
-Taking all thise fragments into one, we now have a script that does background subtraction. 
+Taking all these fragments into one, we now have a script that does background subtraction. 
 
 
 ```python
@@ -1373,13 +1373,13 @@ for i in range(len(meanInt_Cell)):
 rtallcellVSVG.show('AllCell')
 ```
 
-### Prescreening of Images.
+### Pre-screening of Images.
 
-We will not go over the details of full processing, but the prescreening code is a good example of accessing multiple files and process images. 
+We will not go over the details of full processing, but the pre-screening code is a good example of accessing multiple files and process images. 
 
 <https://gist.github.com/cmci/9684453>
 
-Prescreen results are saved under
+Pre-screen results are saved under
 
 	/g/data/bio-it_centres_course/data/VSVG/prescreen
 	
