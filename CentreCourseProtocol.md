@@ -490,7 +490,7 @@ Particle analysis 1 (with imp2)
 		:show: None
 		:check Display Results, Clear results, Exclude on Edges, Include Holes
 
-q1, q3, offset calculation: Copy and paste <https://gist.github.com/cmci/9641262>
+q1, q3, offset calculation: Copy and paste <https://gist.github.com/miura/9641262>
 
      Example results: 2926.0 3854.0 1392.0
      min2 = q1 - offset (= 2462)
@@ -629,7 +629,7 @@ csv.reader
 
 Codes used in this interactive session assembled in a file and in 
 
-<https://gist.github.com/cmci/9687511>
+<https://gist.github.com/miura/9687511>
 
 ### File access
 
@@ -1115,7 +1115,7 @@ backSub(imp)
 
 A script for processing single image dataset is:
 
-<https://gist.github.com/cmci/9765308>
+<https://gist.github.com/miura/9765308>
 
 ```python
 from ij.plugin.filter import GaussianBlur
@@ -1255,7 +1255,7 @@ impfilteredNuc = nucleusSegmentation(imp2)
 impfilteredNuc.show()
 
 ```
-<https://gist.github.com/cmci/9644827>
+<https://gist.github.com/miura/9644827>
 
 
 ### ROI generator, Measurements & Transport Ratio
@@ -1377,7 +1377,7 @@ rtallcellVSVG.show('AllCell')
 
 We will not go over the details of full processing, but the pre-screening code is a good example of accessing multiple files and process images. 
 
-<https://gist.github.com/cmci/9684453>
+<https://gist.github.com/miura/9684453>
 
 Pre-screen results are saved under
 
@@ -1387,7 +1387,7 @@ Pre-screen results are saved under
 
 Assembling all the fragments as a single script, here is the final code to submit. 
 
-<https://github.com/cmci/HTManalysisCourse/blob/master/measTransportBatch3.py>
+<https://github.com/miura/HTManalysisCourse/blob/master/measTransportBatch3.py>
 
 An important command that appears only here is 'sys.argv`, which holds the argument added in the command line. Try the following to see what is happening. 
 
@@ -1427,7 +1427,7 @@ As there is no line in the script to create a new folder, 'out_kota' should be c
 
 Here is the code written by Clemens. 
 
-<https://github.com/cmci/HTManalysisCourse/blob/master/fiji_script.sh>
+<https://github.com/miura/HTManalysisCourse/blob/master/fiji_script.sh>
 
 ```sh
 #!/bin/bash -e
